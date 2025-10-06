@@ -13483,8 +13483,6 @@ with pkgs;
   curseofwar = callPackage ../games/curseofwar { SDL = null; };
   curseofwar-sdl = callPackage ../games/curseofwar { ncurses = null; };
 
-  cutemaze = qt6Packages.callPackage ../games/cutemaze { };
-
   ddnet-server = ddnet.override { buildClient = false; };
 
   duckmarines = callPackage ../games/duckmarines { love = love_0_10; };
