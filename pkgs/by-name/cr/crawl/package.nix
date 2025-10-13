@@ -26,7 +26,7 @@
 }:
 
 stdenv.mkDerivation rec {
-  pname = "crawl${lib.optionalString tileMode "-tiles"}";
+  pname = "crawl";
   version = "0.33.1";
 
   src = fetchFromGitHub {
@@ -39,9 +39,9 @@ stdenv.mkDerivation rec {
   # Patch hard-coded paths and remove force library builds
   postPatch = ''
     substituteInPlace crawl-ref/source/util/find_font \
-      --replace '/usr/share/fonts /usr/local/share/fonts /usr/*/lib/X11/fonts' '${fontsPath}/share/fonts'
+      --replace-fail '/usr/share/fonts /usr/local/share/fonts /usr/*/lib/X11/fonts' '${fontsPath}/share/fonts'
     substituteInPlace crawl-ref/source/windowmanager-sdl.cc \
-      --replace 'SDL_image.h' 'SDL2/SDL_image.h'
+      --replace-fail 'SDL_image.h' 'SDL2/SDL_image.h'
   '';
 
   nativeBuildInputs = [
@@ -114,7 +114,7 @@ stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
 
-  meta = with lib; {
+  meta = {
     description = "Open-source, single-player, role-playing roguelike game";
     homepage = "http://crawl.develz.org/";
     longDescription = ''
@@ -123,13 +123,13 @@ stdenv.mkDerivation rec {
       with dangerous and unfriendly monsters in a quest to rescue the
       mystifyingly fabulous Orb of Zot.
     '';
-    platforms = platforms.linux ++ platforms.darwin;
-    license = with licenses; [
+    platforms = lib.platforms.unix;
+    license = with lib.licenses; [
       gpl2Plus
       bsd2
       bsd3
       mit
-      licenses.zlib
+      zlib
       cc0
     ];
     maintainers = [ ];
