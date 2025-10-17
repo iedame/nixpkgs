@@ -2,19 +2,12 @@
   stdenv,
   lib,
   fetchFromGitHub,
-  wrapQtAppsHook,
-  qmake,
   pkg-config,
-  qtbase,
-  qtsvg,
-  qttools,
-  qtserialport,
-  qtwayland,
-  qt5compat,
+  kdePackages,
+  qt6,
   boost,
   libngspice,
   libgit2,
-  quazip,
   clipper,
 }:
 
@@ -56,25 +49,25 @@ stdenv.mkDerivation {
   ];
 
   nativeBuildInputs = [
-    qmake
+    qt6.qmake
     pkg-config
-    qttools
-    wrapQtAppsHook
+    qt6.qttools
+    qt6.wrapQtAppsHook
   ];
 
   buildInputs = [
-    qtbase
-    qtsvg
-    qtserialport
-    qt5compat
+    qt6.qtbase
+    qt6.qtsvg
+    qt6.qtserialport
+    qt6.qt5compat
     boost
     libgit2
-    quazip
+    kdePackages.quazip
     libngspice
     clipper
   ]
   ++ lib.optionals stdenv.hostPlatform.isLinux [
-    qtwayland
+    qt6.qtwayland
   ];
 
   postPatch = ''
@@ -89,7 +82,7 @@ stdenv.mkDerivation {
       --replace-fail 'PartsChecker::getSha(dir.absolutePath());' '"${partsSha}";'
 
     substituteInPlace phoenix.pro \
-      --replace-fail "6.5.10" "${qtbase.version}"
+      --replace-fail "6.5.10" "${qt6.qtbase.version}"
 
     substituteInPlace src/simulation/ngspice_simulator.cpp \
       --replace-fail 'path + "/" + libName' '"${libngspice}/lib/libngspice.so"'
@@ -100,11 +93,11 @@ stdenv.mkDerivation {
 
   env = {
     NIX_CFLAGS_COMPILE = lib.concatStringsSep " " [
-      "-I${lib.getDev quazip}/include/QuaZip-Qt${lib.versions.major qtbase.version}-${quazip.version}"
+      "-I${lib.getDev kdePackages.quazip}/include/QuaZip-Qt${lib.versions.major qt6.qtbase.version}-${kdePackages.quazip.version}"
       "-I${svgpp}/include"
       "-I${clipper}/include/polyclipping"
     ];
-    NIX_LDFLAGS = "-lquazip1-qt${lib.versions.major qtbase.version}";
+    NIX_LDFLAGS = "-lquazip1-qt${lib.versions.major qt6.qtbase.version}";
   };
 
   qmakeFlags = [
