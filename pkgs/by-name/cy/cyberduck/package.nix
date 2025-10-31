@@ -44,6 +44,10 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   versionCheckProgramArg = [ "${placeholder "out"}/Applications/Cyberduck.app/Contents/Info.plist" ];
   doInstallCheck = true;
 
+  passthru = {
+    updateScript = ./update.sh;
+  };
+
   meta = {
     description = "Libre file transfer client for Mac and Windows";
     homepage = "https://cyberduck.io";
