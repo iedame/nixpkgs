@@ -27,6 +27,10 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     runHook postInstall
   '';
 
+  passthru = {
+    updateScript = ./update.sh;
+  };
+
   meta = {
     description = "Powerful and full-featured professional HTML and text editor for macOS";
     homepage = "https://www.barebones.com/products/bbedit/";
