@@ -10,7 +10,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
 
   src = fetchurl {
     url = "https://dist.mountainduck.io/Mountain%20Duck-${finalAttrs.version}.zip";
-    sha256 = "sha256-f69DBNj15dxkNxmFtoxA3d/bSpagpOX7l84fE4a/VWw=";
+    hash = "sha256-f69DBNj15dxkNxmFtoxA3d/bSpagpOX7l84fE4a/VWw=";
   };
   dontUnpack = true;
 
@@ -25,15 +25,19 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     runHook postInstall
   '';
 
-  meta = with lib; {
+  passthru = {
+    updateScript = ./update.sh;
+  };
+
+  meta = {
     description = "Mount server and cloud storage as a disk on macOS and Windows";
     homepage = "https://mountainduck.io";
-    license = licenses.unfree;
+    license = lib.licenses.unfree;
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
-    maintainers = with maintainers; [
+    maintainers = with lib.maintainers; [
       emilytrau
       iedame
     ];
-    platforms = platforms.darwin;
+    platforms = lib.platforms.darwin;
   };
 })
