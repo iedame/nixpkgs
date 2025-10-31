@@ -26,6 +26,10 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     runHook postInstall
   '';
 
+  passthru = {
+    updateScript = ./update.sh;
+  };
+
   meta = {
     description = "macOS file archiver";
     homepage = "https://www.keka.io";
