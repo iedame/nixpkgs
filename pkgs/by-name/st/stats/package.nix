@@ -3,7 +3,6 @@
   stdenvNoCC,
   fetchurl,
   undmg,
-  nix-update-script,
 }:
 
 stdenvNoCC.mkDerivation (finalAttrs: {
@@ -28,7 +27,9 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     runHook postInstall
   '';
 
-  passthru.updateScript = nix-update-script { };
+  passthru = {
+    updateScript = ./update.sh;
+  };
 
   meta = {
     description = "macOS system monitor in your menu bar";
