@@ -8,16 +8,18 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "sic-image-cli";
-  version = "0.22.4";
+  version = "0.24.0";
 
   src = fetchFromGitHub {
     owner = "foresterre";
     repo = "sic";
     rev = "v${version}";
-    hash = "sha256-PFbHHO3m4mnV5s8DVev/iao9sC3FYht0whTHYzO25Yo=";
+    hash = "sha256-pnnMRRccxSA5F6oIbe9wvdMmuSUMI7Da+NtwyH2psjo=";
   };
 
-  cargoHash = "sha256-HL/KCC8Y42OFL1LXoewmH1Bxp6FICuDjkTnK5DE94Ms=";
+  cargoHash = "sha256-6QMMP6Uss9r6zNd/S6w7yo19IBOQyLmFvcn2o0MkOq4=";
+
+  enableParallelBuilding = true;
 
   nativeBuildInputs = [
     installShellFiles
@@ -29,8 +31,8 @@ rustPlatform.buildRustPackage rec {
   '';
 
   postInstall = ''
-    installShellCompletion sic.{bash,fish}
-    installShellCompletion --zsh _sic
+    installShellCompletion ig.{bash,fish}
+    installShellCompletion --zsh _ig
   '';
 
   meta = {
@@ -42,6 +44,6 @@ rustPlatform.buildRustPackage rec {
       mit
     ];
     maintainers = [ ];
-    mainProgram = "sic";
+    mainProgram = "ig";
   };
 }
