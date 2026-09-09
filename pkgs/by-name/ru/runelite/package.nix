@@ -7,19 +7,20 @@
   gradle,
   jdk17,
   jre,
-  libXxf86vm,
+  libxxf86vm,
   libGL,
+  nix-update-script,
 }:
 
-stdenv.mkDerivation (finalAttrs: rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "runelite";
-  version = "2.7.5";
+  version = "2.8.0";
 
   src = fetchFromGitHub {
     owner = "runelite";
     repo = "launcher";
-    rev = version;
-    hash = "sha256-HZ4aV+7173EZrHHbsEFsrh3BHXsZuWS/MvDBS/AYANY=";
+    tag = finalAttrs.version;
+    hash = "sha256-1IUjbZEvoHb2Fer16rIvi6shMsol+hiPLQleXHRVLEU=";
   };
 
   desktop = makeDesktopItem {
@@ -44,8 +45,6 @@ stdenv.mkDerivation (finalAttrs: rec {
     data = ./deps.json;
   };
 
-  __darwinAllowLocalNetworking = true;
-
   gradleFlags = [ "-Dorg.gradle.java.home=${jdk17}" ];
 
   gradleBuildTask = "shadowJar";
@@ -57,29 +56,19 @@ stdenv.mkDerivation (finalAttrs: rec {
     cp build/libs/RuneLite.jar $out/share
     cp appimage/runelite.png $out/share/icons
 
-    ln -s ${desktop}/share/applications/RuneLite.desktop $out/share/applications/RuneLite.desktop
+    ln -s ${finalAttrs.desktop}/share/applications/RuneLite.desktop $out/share/applications/RuneLite.desktop
 
     makeWrapper ${jre}/bin/java $out/bin/runelite \
       --prefix LD_LIBRARY_PATH : "${
         lib.makeLibraryPath [
-          libXxf86vm
+          libxxf86vm
           libGL
         ]
       }" \
       --add-flags "-jar $out/share/RuneLite.jar"
   '';
 
-  passthru.updateScript =
-    let
-      pkg = finalAttrs.finalPackage;
-    in
-    gradle.fetchDeps
-      {
-        inherit (finalAttrs) pname;
-        inherit pkg;
-        data = ./deps.json;
-      }
-      .updateScript;
+  passthru.updateScript = nix-update-script { };
 
   meta = {
     description = "Open source Old School RuneScape client";
@@ -94,7 +83,7 @@ stdenv.mkDerivation (finalAttrs: rec {
       moody
       iedame
     ];
-    platforms = [ "x86_64-linux" ];
+    platforms = lib.platforms.linux;
     mainProgram = "runelite";
   };
 })
