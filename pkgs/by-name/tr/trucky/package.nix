@@ -28,6 +28,8 @@ appimageTools.wrapType2 rec {
     install -Dm444 ${appimageContents}/trucky-electron.png $out/share/icons/hicolor/48x48/apps/trucky-electron.png
   '';
 
+  passthru.updateScript = ./update.sh;
+
   meta = {
     description = "The Virtual Trucker Companion";
     homepage = "https://truckyapp.com/";
