@@ -6,75 +6,92 @@
   xvidcore,
   libGLU,
   libGL,
-  SDL,
-  SDL_ttf,
-  SDL_mixer,
   curl,
   libjpeg,
   libpng,
+  gawk,
+  gnugrep,
+  gnused,
   gettext,
   cunit,
+  doxygen,
+  SDL2,
+  SDL2_mixer,
+  SDL2_image,
+  SDL2_ttf,
+  python3,
+  pkg-config,
   enableEditor ? false,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "ufoai";
-  version = "2.4";
+  version = "2.5";
   src = fetchurl {
     url = "mirror://sourceforge/ufoai/ufoai-${finalAttrs.version}-source.tar.bz2";
-    sha256 = "0kxrbcjrharcwz319s90m789i4my9285ihp5ax6kfhgif2vn2ji5";
+    hash = "sha256-DHzDvJ7+snb3HL5u6P98dvmNGD3nnxoGn6YwWc8YKo8=";
   };
 
   srcData = fetchurl {
     url = "mirror://sourceforge/ufoai/ufoai-${finalAttrs.version}-data.tar";
-    sha256 = "1drhh08cqqkwv1yz3z4ngkplr23pqqrdx6cp8c3isy320gy25cvb";
+    hash = "sha256-XnBqQkr/ai6jCkx5gSnWME6Jc4fq34CFKBKbUSt9zbA=";
   };
 
+  patches = lib.optional stdenv.hostPlatform.isAarch64 [
+    ./patch-bug-5345.diff
+    ./patch-bug-5336.diff
+  ];
+
   env = {
-    # Workaround build failure on -fno-common toolchains:
-    #   ld: r_gl.h:52: multiple definition of `qglGenBuffers';
-    #     r_gl.h:52: first defined here
-    # TODO: drop once release contains upstream fix:
-    #   https://github.com/ufoai/ufoai/commit/8a3075fffdad294e
     NIX_CFLAGS_COMPILE = "-fcommon";
-    NIX_CFLAGS_LINK = toString [
-      # to avoid occasional runtime error in finding libgcc_s.so.1
+    NIX_CFLAGS_LINK = toString (
+      lib.optionals stdenv.hostPlatform.isLinux [
       "-lgcc_s"
-      # tests are underlinked against libm:
-      # ld: release-linux-x86_64/testall/client/sound/s_mix.c.o: undefined reference to symbol 'acos@@GLIBC_2.2.5'
       "-lm"
-    ];
+      ]
+    );
   };
 
   preConfigure = ''tar xvf "${finalAttrs.srcData}"'';
 
   configureFlags = [
     "--enable-release"
-    "--enable-sse"
   ]
-  ++ lib.optional enableEditor "--enable-uforadiant";
+  ++ lib.optional enableEditor "--enable-uforadiant"
+  ++ lib.optional stdenv.hostPlatform.isx86 "--enable-sse"
+  ++ lib.optional stdenv.hostPlatform.isDarwin "--target-os=darwin";
+
+  nativeBuildInputs = [
+    pkg-config
+    gawk
+    gettext
+    gnugrep
+    gnused
+  ];
 
   buildInputs = [
     libtheora
     xvidcore
     libGLU
     libGL
-    SDL
-    SDL_ttf
-    SDL_mixer
     curl
     libjpeg
     libpng
     gettext
     cunit
+    doxygen
+    SDL2
+    SDL2_mixer
+    SDL2_image
+    SDL2_ttf
+    python3
   ];
 
   meta = {
     homepage = "http://ufoai.org";
     description = "Squad-based tactical strategy game in the tradition of X-Com";
     license = lib.licenses.gpl2Plus;
-    maintainers = [ ];
-    platforms = lib.platforms.linux;
-    hydraPlatforms = [ ];
+    maintainers = with lib.maintainers; [ iedame ];
+    platforms = lib.platforms.unix;
   };
 })
