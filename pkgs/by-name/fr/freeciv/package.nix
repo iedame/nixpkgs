@@ -129,7 +129,10 @@ stdenv.mkDerivation (finalAttrs: {
     '';
     homepage = "https://freeciv.org/";
     license = lib.licenses.gpl2Plus;
-    maintainers = with lib.maintainers; [ pierron ];
+    maintainers = with lib.maintainers; [
+      iedame
+      pierron
+    ];
     platforms = lib.platforms.unix;
     hydraPlatforms = lib.platforms.linux; # sdl-config times out on darwin
     broken = qtClient && stdenv.hostPlatform.isDarwin; # Missing Qt5 development files
