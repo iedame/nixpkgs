@@ -59,7 +59,7 @@ in
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "wesnoth${suffix}";
-  version = if enableDevel then "1.19.28" else "1.18.8";
+  version = if enableDevel then "1.19.29" else "1.18.8";
 
   src = fetchFromGitHub {
     owner = "wesnoth";
@@ -67,7 +67,7 @@ stdenv.mkDerivation (finalAttrs: {
     tag = finalAttrs.version;
     hash =
       if enableDevel then
-        "sha256-5S2kgqn+HZIPguQP+FYaK79Cvx0IRnmcGSeWPQflt/g="
+        "sha256-z2z0CZUMAwOiPgin69aEWXQkSqJHg9Y5pzSsTYUtSGo="
       else
         "sha256-Tgp3y120j5nqoBrDo7D9C0FcVO3TH5lf+/SoCjR+ikc=";
   };
@@ -76,7 +76,12 @@ stdenv.mkDerivation (finalAttrs: {
   doInstallCheck = true;
 
   nativeInstallCheckInputs = [ versionCheckHook ];
-  versionCheckProgram = "${placeholder "out"}/bin/wesnothd${suffix}";
+  # Without this, wesnoth redirects stdout to a log file in its userdata dir
+  # (./.wesnoth* when HOME is unset) whenever that dir is writable
+  preVersionCheck = ''
+    export WESNOTH_NO_LOG_FILE=1
+  '';
+  versionCheckKeepEnvironment = [ "WESNOTH_NO_LOG_FILE" ];
 
   nativeBuildInputs = [
     cmake
@@ -110,8 +115,7 @@ stdenv.mkDerivation (finalAttrs: {
 
     substituteInPlace packaging/org.wesnoth.Wesnoth${suffix}.desktop \
       --replace-fail "Name=Battle for Wesnoth" "Name=Battle for Wesnoth${suffix}" \
-      --replace-fail "Exec=sh -c \"wesnoth >/dev/null 2>&1\"" "Exec=sh -c \"wesnoth${suffix} >/dev/null 2>&1\"" \
-      --replace-fail "Exec=sh -c \"wesnoth -e  >/dev/null 2>&1\"" "Exec=sh -c \"wesnoth${suffix} -e  >/dev/null 2>&1\""
+      --replace-fail "Exec=wesnoth" "Exec=wesnoth${suffix}"
 
     substituteInPlace packaging/org.wesnoth.Wesnoth${suffix}.appdata.xml \
       --replace-fail "<name>Battle for Wesnoth</name>" "<name>Battle for Wesnoth${suffix}</name>" \
