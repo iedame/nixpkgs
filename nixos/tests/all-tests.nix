@@ -2001,6 +2001,7 @@ in
   watt = runTest ./watt.nix;
   webhook = runTest ./webhook.nix;
   weblate = runTest ./web-apps/weblate.nix;
+  wesnothd = runTest ./wesnothd.nix;
   wg-access-server = runTest ./wg-access-server.nix;
   whisparr_2 = runTest {
     imports = [ ./whisparr.nix ];
