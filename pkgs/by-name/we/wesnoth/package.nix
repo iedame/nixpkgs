@@ -25,6 +25,7 @@
   lua5_4,
   curl,
   nix-update-script,
+  nixosTests,
   versionCheckHook,
   enableDevel ? false,
 }:
@@ -151,6 +152,8 @@ stdenv.mkDerivation (finalAttrs: {
     # find the bundle resources
     makeBinaryWrapper "$app_bundle/Contents/MacOS/wesnoth${suffix}" "$out/bin/wesnoth${suffix}"
   '';
+
+  passthru.tests.nixos = nixosTests.wesnothd;
 
   passthru.updateScript = nix-update-script {
     extraArgs = [
