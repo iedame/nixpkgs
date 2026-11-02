@@ -107,7 +107,14 @@ lib.extendMkDerivation {
         inherit (retroarch-bare.meta) platforms;
         teams = [ lib.teams.libretro ];
       }
-      // lib.optionalAttrs finalAttrs.includeRetroArch { inherit mainProgram; }
+      // lib.optionalAttrs finalAttrs.includeRetroArch {
+        inherit mainProgram;
+        # hydra can't build RetroArch everywhere, see retroarch-bare. Setting this makes hydra ignore
+        # badPlatforms, so exclude those too.
+        hydraPlatforms = lib.intersectLists retroarch-bare.meta.hydraPlatforms (
+          lib.subtractLists (finalAttrs.meta.badPlatforms or [ ]) finalAttrs.meta.platforms
+        );
+      }
       // meta;
     };
 }
