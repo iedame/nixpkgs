@@ -1,0 +1,13 @@
+--- a/gfx/video_driver.c
++++ b/gfx/video_driver.c
+@@ -2294,7 +2294,9 @@
+ 
+                /* If we have configured one of the HW render
+                 * capable GL drivers, go with that. */
+-#if defined(HAVE_OPENGL_CORE)
++               /* macOS only provides OpenGL 2.1 for a legacy context,
++                * which glcore can't use. */
++#if defined(HAVE_OPENGL_CORE) && !defined(OSX)
+                if (     !string_is_equal(settings->arrays.video_driver, "gl")
+                      && !string_is_equal(settings->arrays.video_driver, "glcore"))
+                {

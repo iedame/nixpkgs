@@ -3,6 +3,7 @@
   libretro,
   makeBinaryWrapper,
   retroarch-bare,
+  stdenv,
   writeText,
   symlinkJoin,
   cores ? [ ],
@@ -50,6 +51,10 @@ symlinkJoin {
 
     # wrap binary to load cores from the proper location(s)
     wrapProgram $out/bin/retroarch ${wrapperArgs}
+  ''
+  # Finder and Spotlight run the app directly
+  + lib.optionalString stdenv.hostPlatform.isDarwin ''
+    wrapProgram $out/Applications/RetroArch.app/Contents/MacOS/RetroArch ${wrapperArgs}
   '';
 
   meta = {
@@ -59,9 +64,11 @@ symlinkJoin {
       homepage
       license
       mainProgram
+      mainDarwinApp
       maintainers
       teams
       platforms
+      hydraPlatforms
       ;
 
     longDescription = ''
