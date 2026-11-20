@@ -4,6 +4,7 @@
   pnpm_12,
   nodejs,
   fetchFromGitHub,
+  fetchzip,
   python3,
   electron_45,
   makeDesktopItem,
@@ -16,6 +17,13 @@
 let
   pnpm = pnpm_12;
   electron = electron_45;
+
+  # electron-builder downloads this icon toolset (JavaScript and WebAssembly) to convert
+  # the app icon for macOS
+  iconsToolset = fetchzip {
+    url = "https://github.com/electron-userland/electron-builder-binaries/releases/download/icons@1.2.3/icons-bundle.tar.gz";
+    hash = "sha256-onqiTAO2NU+obW43RdqUOyR45PqqRFelOborKng0TCs=";
+  };
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "shiru";
@@ -43,6 +51,10 @@ stdenv.mkDerivation (finalAttrs: {
     copyDesktopItems
   ];
 
+  env = lib.optionalAttrs stdenv.hostPlatform.isDarwin {
+    ELECTRON_BUILDER_ICONS_TOOLSET_DIR = iconsToolset;
+  };
+
   pnpmDeps = fetchPnpmDeps {
     inherit (finalAttrs) pname version src;
     inherit pnpm;
@@ -63,7 +75,8 @@ stdenv.mkDerivation (finalAttrs: {
 
     npm run web:build
 
-    ./node_modules/.bin/electron-builder --dir \
+    # pnpm 12.9's POSIX bin shims fail in the darwin sandbox: https://github.com/pnpm/pnpm/issues/17750
+    node ./node_modules/electron-builder/cli.js --dir \
       --c.electronDist=electron-dist \
       --c.electronVersion=${electron.version} \
       ${lib.optionalString stdenv.hostPlatform.isDarwin ''
