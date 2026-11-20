@@ -145,6 +145,7 @@ stdenv.mkDerivation (finalAttrs: {
     changelog = "https://github.com/RockinChaos/Shiru/releases/tag/v${finalAttrs.version}";
     license = lib.licenses.gpl3Plus;
     maintainers = with lib.maintainers; [
+      iedame
       naomieow
     ];
     platforms = [
