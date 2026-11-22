@@ -3,8 +3,11 @@
   stdenv,
   fetchFromGitHub,
 
+  autoconf,
   cmake,
+  nasm,
   pkg-config,
+  xxd,
 
   libGL,
   libx11,
@@ -12,25 +15,32 @@
   vulkan-loader,
 
   callPackage,
+  pkgsCross,
 }:
 
+let
+  x86Bintools = pkgsCross.gnu64.buildPackages.binutils;
+in
 stdenv.mkDerivation (finalAttrs: {
   pname = "felix86";
-  version = "26.04";
+  version = "26.11";
 
   src = fetchFromGitHub {
     owner = "OFFTKP";
     repo = "felix86";
     tag = finalAttrs.version;
-    hash = "sha256-onhPibvO74yo95zop7EhG+EILn4M70X9ivhS9I+fIBY=";
+    hash = "sha256-bZicwdVuG2BUb3+5J7vUngQh9qXBsezzo11wZRkOYog=";
   };
 
   strictDeps = true;
 
   nativeBuildInputs = [
+    autoconf
     cmake
+    nasm
     pkg-config
     vulkan-headers
+    xxd
   ];
 
   buildInputs = [
@@ -50,6 +60,9 @@ stdenv.mkDerivation (finalAttrs: {
   cmakeFlags = [
     (lib.cmakeBool "ZYDIS_BUILD_DOXYGEN" false)
     (lib.cmakeBool "BUILD_TESTS" true)
+    (lib.cmakeBool "FELIX86_MONTHLY_RELEASE" true)
+    # x86-64 binutils to link the guest vDSO
+    (lib.cmakeFeature "FELIX86_X86_CROSS" "${x86Bintools}/bin/${x86Bintools.targetPrefix}")
   ];
 
   passthru.tests = callPackage ./test.nix { };
