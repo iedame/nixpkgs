@@ -36,13 +36,14 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "gdlauncher-carbon";
   version = "2.0.24";
 
-  src = appimageTools.extract {
-    inherit (finalAttrs) pname version;
-    src = fetchurl {
-      url = "https://cdn-raw.gdl.gg/launcher/GDLauncher__${finalAttrs.version}__linux__x64.AppImage";
-      hash = "sha256-d5ZvWSLA/7mY0540TDLMW9qmEFA5xC6Zd83IWakOmGo=";
-    };
+  src = fetchurl {
+    url = "https://cdn-raw.gdl.gg/launcher/GDLauncher__${finalAttrs.version}__linux__x64.AppImage";
+    hash = "sha256-d5ZvWSLA/7mY0540TDLMW9qmEFA5xC6Zd83IWakOmGo=";
   };
+
+  appimageContents = appimageTools.extract { inherit (finalAttrs) pname version src; };
+
+  dontUnpack = true;
 
   nativeBuildInputs = [
     graphicsmagick
@@ -62,11 +63,11 @@ stdenv.mkDerivation (finalAttrs: {
     runHook preInstall
 
     mkdir -p $out/share/gdlauncher-carbon/resources
-    cp -r $src/resources/{binaries,app.asar} $out/share/gdlauncher-carbon/resources/
+    cp -r ${finalAttrs.appimageContents}/resources/{binaries,app.asar} $out/share/gdlauncher-carbon/resources/
 
     # The provided icon is a bit large for some systems, so make smaller ones
     for size in 48 96 128 256 512; do
-      gm convert $src/@gddesktop.png -resize ''${size}x''${size} icon_$size.png
+      gm convert ${finalAttrs.appimageContents}/@gddesktop.png -resize ''${size}x''${size} icon_$size.png
       install -D icon_$size.png $out/share/icons/hicolor/''${size}x''${size}/apps/gdlauncher-carbon.png
     done
 
