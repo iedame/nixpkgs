@@ -34,11 +34,11 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "gdlauncher-carbon";
-  version = "2.0.24";
+  version = "2.0.40";
 
   src = fetchurl {
     url = "https://cdn-raw.gdl.gg/launcher/GDLauncher__${finalAttrs.version}__linux__x64.AppImage";
-    hash = "sha256-d5ZvWSLA/7mY0540TDLMW9qmEFA5xC6Zd83IWakOmGo=";
+    hash = "sha256-3XwB8zPOX83zxpPiRtLoKb+CBJF6ax7y3WfQyEXbAzY=";
   };
 
   appimageContents = appimageTools.extract { inherit (finalAttrs) pname version src; };
