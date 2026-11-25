@@ -1,0 +1,33 @@
+diff --git a/cmake/BundledDeps.cmake b/cmake/BundledDeps.cmake
+index 703b704..c3b9679 100644
+--- a/cmake/BundledDeps.cmake
++++ b/cmake/BundledDeps.cmake
+@@ -108,10 +108,16 @@ smw_declare_gitrepo(
+ set(ZLIB_BUILD_TESTING OFF CACHE BOOL "")
+ set(ZLIB_BUILD_SHARED OFF CACHE BOOL "")
+ set(ZLIB_INSTALL OFF CACHE BOOL "")
+-smw_declare_gitrepo(
++# Not smw_declare_gitrepo: NAMES would force config mode, but most system
++# zlib installs only work with the FindZLIB module, found by the exact name
++FetchContent_Declare(
+     ZLIB
+-    https://github.com/madler/zlib.git
+-    v1.3.2
++    GIT_REPOSITORY https://github.com/madler/zlib.git
++    GIT_TAG v1.3.2
++    GIT_SHALLOW TRUE
++    GIT_PROGRESS TRUE
++    SYSTEM
++    FIND_PACKAGE_ARGS
+ )
+ 
+ 
+@@ -121,7 +127,7 @@ if(NOT NO_NETWORK)
+ endif()
+ # SDL *may* pull in its own vendored zlib
+ if (NOT TARGET ZLIB::ZLIB AND NOT TARGET ZLIB::ZLIBSTATIC)
+-    FetchContent_MakeAvailable(zlib)
++    FetchContent_MakeAvailable(ZLIB)
+ endif()
+ 
+ 
