@@ -177,8 +177,15 @@ stdenv.mkDerivation (finalAttrs: {
 
     mkdir -p $out/Applications $out/bin
 
-    cp ./bin/Release/${finalAttrs.pname}-room $out/bin
-    cp -r ./bin/Release/${finalAttrs.pname}.app $out/Applications
+    cp ./bin/Release/azahar-room $out/bin
+    cp -r ./bin/Release/azahar.app $out/Applications
+
+    # launch through the bundle, the app warns when run directly
+    cat << EOF > $out/bin/azahar
+    #!${stdenv.shell}
+    exec open -na "$out/Applications/azahar.app" --args "\$@"
+    EOF
+    chmod +x $out/bin/azahar
 
     runHook postInstall
   '';
