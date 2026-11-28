@@ -9,7 +9,7 @@
   enet,
   fetchFromGitHub,
   fmt,
-  ffmpeg_6-headless,
+  ffmpeg_7-headless,
   glslang,
   httplib,
   inih,
@@ -61,7 +61,7 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "azahar";
-  version = "2126.2";
+  version = "2127.0.1";
 
   src = fetchFromGitHub {
     owner = "azahar-emu";
@@ -70,11 +70,11 @@ stdenv.mkDerivation (finalAttrs: {
     postCheckout = ''
       git -C "$out/externals" submodule update --init \
         teakra zstd discord-rpc spirv-headers spirv-tools sirit xxHash \
-        faad2/faad2 lodepng/lodepng dds-ktx nihstro "$out/dist/compatibility_list"
+        faad2/faad2 lodepng/lodepng dds-ktx nihstro microtar "$out/dist/compatibility_list"
       echo "${finalAttrs.version}" > "$out/GIT-TAG"
       git -C "$out" rev-parse HEAD > "$out/GIT-COMMIT"
     '';
-    hash = "sha256-wgF7n2ju8rP5jphHAj+fTLjfdhSz1OVDBHGNKJFlP2E=";
+    hash = "sha256-TC0y0ehBfBC7n3iYayPF9te2DLs9DFJbqfyobCjE9F8=";
   };
 
   patches = [ ./quartzcore.patch ];
@@ -96,7 +96,7 @@ stdenv.mkDerivation (finalAttrs: {
     dynarmic
     enet
     fmt
-    ffmpeg_6-headless
+    ffmpeg_7-headless
     glslang
     httplib
     inih
@@ -198,7 +198,7 @@ stdenv.mkDerivation (finalAttrs: {
   meta = {
     description = "Open-source 3DS emulator project based on Citra";
     homepage = "https://github.com/azahar-emu/azahar";
-    license = lib.licenses.gpl2Only;
+    license = lib.licenses.gpl3Plus;
     maintainers = with lib.maintainers; [ marcin-serwin ];
     mainProgram = "azahar";
     platforms = with lib.platforms; linux ++ darwin;
